@@ -1,0 +1,22 @@
+{
+  "name": "ch04_code",
+  "version": "1.0.0",
+  "description": "",
+  "main": "VisitBARTWebService.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mm6/Ch04_code.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mm6/Ch04_code/issues"
+  },
+  "homepage": "https://github.com/mm6/Ch04_code#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
