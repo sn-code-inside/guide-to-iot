@@ -2,7 +2,7 @@
 ## Guide To Internet of Things
 ## Code repository
 
-+ [Chapter 01 code](../main/Ch01_code)
++ [Chapter 01 code](./Ch01_code)
 + [Chapter 02 code](../main/Ch02_code)
 + [Chapter 03 code](../main/Ch03_code)
 + [Chapter 04 code](../main/Ch04_code)
