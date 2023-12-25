@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <title>Mike's Cafe - Menu</title>
+        <!-- Meta tags tell give important information about our webpage -->
+        <!-- The viewport meta tag is needed for responsive layouts -->
+        <meta charset="utf-8"/>
+        <meta name="description" content="The menu for Mike's Cafe" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- Including CSS rules from styles.css in our page -->
+        <link rel="stylesheet" type="text/css" href="styles.css"/>
+    </head>
+    <body>
+        <!-- Throughout the body, we are using semantic HTML tags to
+            give better insight into the content on the page. This
+            is thought to be better than simply using <div> everywhere -->
+        <header>
+            <h1>Mike's <br/> Cafe + Restaurant</h1>
+            <!-- Below is the main navigation menu. Since only the home and menu
+                pages are built, the others have placeholder links -->
+            <nav>
+                <a class="button" href="index.html">Home</a>
+                <a class="button" href="menu.html">Menu</a>
+                <a class="button" href="contact.html">Contact</a>
+            </nav>
+        </header>
+        <main>
+            <!-- Different parts of the menu are contained in <section>
+                tags to make each part smaller and more manageable -->
+            <section id="intro">
+                <h2>Our Menu</h2>
+                <p>In addition to the atmosphere at Mike's, we take pride in the food that we offer.
+                    All food is prepared fresh by our chef, and everything is customizable to your liking.
+                    We hope you'll grab a bite to eat while you're here!
+                </p>
+            </section>
+            <section id="specials">
+                <h3>Daily Soup Menu</h3>
+                <ul>
+                    <li>Monday: Vegetable Soup</li>
+                    <li>Tuesday: Beef and Barley</li>
+                    <li>Wednesday: Potato Soup</li>
+                    <li>Thursday: Broccoli Cheddar</li>
+                    <li>Friday: Chicken Tortilla</li>
+                    <li>Saturday/Sunday: Chicken Noodle</li>
+                </ul>
+            </section>
+            <section id="appetizers">
+                <h3>Appetizers and Sides</h3>
+                <!-- By using the class "item" on this div, we can use CSS to
+                    style it. Check the CSS for .item to see the rules we've applied -->
+                <div class="item">
+                    <h4>Daily Soup</h4>
+                    <p>$3.00 | A bowl of our fresh-made soup. Check the soup menu for today's option.</p>
+                </div>
+                <div class="item">
+                    <h4>Chef Salad</h4>
+                    <p>$4.00 | Romaine lettuce, cherry tomatoes, red onions, green bell peppers, chickpeas, olives, and banana peppers. Served with ranch or Italian dressing.</p>
+                </div>
+                <div class="item">
+                    <h4>French Fries</h4>
+                    <p>$3.50 | Fresh-cut French fries, baked to crispy perfection. Served with ketchup, hot sauce, or mayonnaise.</p>
+                </div>
+            </section>
+            <section id="sandwiches">
+                <h3>Sandwiches</h3>
+                <div class="item">
+                    <h4>Breakfast Sandwich</h4>
+                    <p>$4.25 | Egg, ham, and cheese, inside a toasted English muffin. A classic favorite.</p>
+                </div>
+                <div class="item">
+                    <h4>Bacon, Lettuce, and Tomato (BLT)</h4>
+                    <p>$4.00 | Crispy bacon, lettuce, tomato, and mayonnaise, inside two pieces of fresh-baked bread.
+                        (Add egg for an additional cost.)
+                    </p>
+                </div>
+                <div class="item">
+                    <h4>Grilled Cheese</h4>
+                    <p>$4.50 | A classic three-cheese grilled cheese, served with a side of your choice.</p>
+                </div>
+            </section>
+            <section id="drinks">
+                <h3>Drinks</h3>
+                <div class="item">
+                    <h4>Coffee (Hot/Iced)</h4>
+                    <p>$1.50 | Both regular coffee and espresso drinks available. Ask about our lattes and macchiatos!</p>
+                </div>
+                <div class="item">
+                    <h4>Tea (Hot/Iced)</h4>
+                    <p>$1.50 | Black, green, and earl gray teas available. Mix-ins include milk, sugar, honey, and lemon.</p>
+                </div>
+                <div class="item">
+                    <h4>Lemonade</h4>
+                    <p>$2.50 | Our refreshing in-house lemonade, made with real, organic lemons.</p>
+                </div>
+                <div class="item">
+                    <h4>Soda</h4>
+                    <p>$3.00 | We offer a variety of Coca-Cola products, including Coca-Cola, Fanta, Sprite, and more.</p>
+                </div>
+            </section>
+        </main>
+        <footer>
+            <!-- &copy; is used to generate the copyright symbol on the page -->
+            <p>&copy; 2021 Mike's Cafe.</p>
+        </footer>
+    </body>
+</html>

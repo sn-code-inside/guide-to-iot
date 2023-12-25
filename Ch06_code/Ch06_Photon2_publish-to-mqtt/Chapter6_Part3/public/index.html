@@ -1,0 +1,202 @@
+<!--
+   Guide to Internet of Things
+
+   Chapter 6 code
+
+   This web application will cause the browser to connect to a
+   running instance of an MQTT broker and subscribe to messages
+   published to the heartBeat topic.
+
+   The broker was started with:
+   mosquitto -c /usr/local/etc/mosquitto/mosquitto.conf -v
+
+   A Google Chart line graph is used to display the hearbeats.
+   After every 10 heartbeats are received and drawn, the drawing begins
+   again from a fresh graph.
+
+   The Google Chart related code fills a DataTable object an Options object.
+   The DataTable and Options objects are passed to the LineChart object when
+   the draw method is called.
+
+   In general, DataTable methods are setValue, addRow, addColumn, etc.
+
+   A Chart is passed a DataTable when draw is called.
+
+ -->
+
+<html>
+<head>
+  <!-- Include Google Charts. -->
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+  <!-- Include MQTT. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+
+  <!-- Begin Javascript. -->
+  <script type="text/javascript">
+
+  <!-- Load the linechart. -->
+  google.charts.load('current', {packages: ['corechart', 'line']});
+  <!-- After the load is complete, call the drawGraph() function. -->
+  google.charts.setOnLoadCallback(drawGraph);
+
+  <!-- Establish some global variables -->
+  var dataTable = null;   // For holding the DataTable data.
+  var options = null;     // For holding the options that a line graph needs.
+  var chart = null;       // For holding the DataTable and Options objects.
+                          // After a heartbeat, we will draw the chart with an
+                          // updated dataTable.
+  var heartBeats = 0;     // This variable tracks the number of heartbeat
+                          // messages that arrive.
+
+  // Call reportSuspected failure function in 13 seconds
+  // if no message arrives. When a message arrives, we will reset the
+  // timer to 13 seconds. The veraible "interval" is used later
+  // to clear or reset the timer.
+  var interval = setInterval(reportSuspectedFailure, 13000);
+
+  // This function runs when the browser loads this document.
+  // It also runs after every 10 heartbeats. After every 10
+  // heartbeats, we want a new, fresh, graph to be drawn.
+  function drawGraph() {
+
+        // create an empty data table
+        dataTable = new google.visualization.DataTable();
+        // X is of type date and Heartbeat is of type Number.
+        // Types are important here.
+        dataTable.addColumn('date', 'X');
+        dataTable.addColumn('number', 'Heartbeat');
+        // Start with point on the plane.
+        // The x-value will be a date and the y value 0.
+        dataTable.addRow([new Date(), 0]);
+
+        // Describe how we want our graph to appear.
+        options = {
+          curveType : 'function',   // given x, compute y
+          hAxis: {
+            title: 'Time'           // title on x axis
+          },
+          vAxis: {
+            title: 'Microcontroller Heartbeat'  // title on y axis
+          }
+        };
+
+        // Create a new line chart and associate it with a location
+        // in the html document.
+        chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+        // Draw the chart with this data and with these options.
+        // The only point will be a single date, 0 pair.
+        chart.draw(dataTable, options);
+      }
+
+      // This function is called for each message that arrives.
+      function displayResults(heartBeatJSON) {
+
+        // The data arrives in JSON format. We parse it to a
+        // Javascript object.
+        var heartBeatMsg = JSON.parse(heartBeatJSON);
+
+        // Create a point and draw a line for this heartbeat.
+        // A line will be drawn from the last point drawn
+        // to this new point.
+        dataTable.addRow([new Date(), 1]);
+
+        // Draw another point back to zero.
+        dataTable.addRow([new Date(), 0]);
+        // Draw the new chart with updated data.
+        chart.draw(dataTable, options);
+        // On the next call to displayResults, we will add more
+        // rows to the same DataTable.
+
+      } // end of displayResults
+
+      // This function runs if we have not heard a heartbeat in the past
+      // 13 seconds
+      function reportSuspectedFailure() {
+        // Place a note in the html document of this suspected failure.
+        document.getElementById("messageDisplay").innerHTML = "Missing heartbeat(s). Suspected failure of device.";
+        // And color the note red.
+        document.getElementById("messageDisplay").style = "color:red";
+        // Clear the timer.
+        clearInterval(interval);
+        // Start it up again with a new delay of 13 seconds.
+        interval = setInterval(reportSuspectedFailure, 13000);
+      }
+
+      // The MQTT related code runs when the page loads.
+      // For a remote broker, we might use
+      // var loc = {'hostname' : 'iot.eclipse.org', 'port' : '80' };
+      var loc = {'hostname' : 'localhost', 'port' : '9002' };
+
+      // Create a client instance with a unique ID.
+      // We use the "new Date" to make sure we provide a new, unique, ID.
+
+      client = new Paho.MQTT.Client(loc.hostname, Number(loc.port), 'HeartbeatSubscriber'+new Date());
+
+      // Set two callback handlers.
+      // One if the connection is lost.
+      client.onConnectionLost = onConnectionLost;
+      // Another when a message arrives.
+      client.onMessageArrived = onMessageArrived;
+
+      // Connect the client and after successful, call the onConnect function.
+      // This function will only be called if the connection has been established.
+      // The call to connect is asynchronous and will return right away. So, we provide
+      // a callback to perform the subscribe.
+
+      client.connect({onSuccess:onConnect});
+
+      // called afer the the client sucessfuly connects to the broker
+
+      function onConnect() {
+        // Once we have a connection, we subscribe to the
+        // topic 'heartbeat'.
+        client.subscribe("heartbeat");
+      }
+
+      // Called if the client loses its connection.
+      function onConnectionLost(responseObject) {
+        alert("Lost the connection to the broker");
+        if (responseObject.errorCode !== 0) {
+          console.log("onConnectionLost:"+responseObject.errorMessage);
+        }
+      }
+
+      // This function is called each time a message arrives from the broker.
+      // We will pass the content to displayResults.
+      function onMessageArrived(message) {
+        // Clear the interval timer. We have a new heartBeat
+        // and so we should begin counting from now.
+        clearInterval(interval);
+        // Associate the new interval with the function named
+        // reportSelectedFailure. This will run reportSuspectedFailure
+        // in 13 seconds - unless it is cleared by a new heartbeat.
+        interval = setInterval(reportSuspectedFailure,13000);
+
+        // count the beats
+        heartBeats = heartBeats + 1;
+        // Draw a brand new graph after every 10 heartbeats.
+        if(heartBeats % 10 === 0) { drawGraph(); }
+        // Place a note in the HTML document that shows this heartbeat message.
+        document.getElementById("messageDisplay").innerHTML = "Received message #"+ (heartBeats) + ":" + message.payloadString;
+        // And color the note black.
+        document.getElementById("messageDisplay").style = "color:black";
+        // Update the graph with the new data.
+        displayResults(message.payloadString);
+      }
+
+</script>
+
+<!-- This HTML is where the chart and messages are displayed. -->
+<title>Microcontroller Heartbeats</title>
+</head>
+<body>
+<!-- container for the chart -->
+<div id="chart_div" style="width: 900px; height: 500px"></div>
+<!-- Some text -->
+Heartbeat subscription
+<!-- container for the messages -->
+<div id = "messageDisplay"></div>
+</body>
+</html>

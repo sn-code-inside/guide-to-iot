@@ -1,0 +1,85 @@
+<!--
+   Guide to Internet of Things
+   Chapter 7 code
+   This web application will cause the browser to connect to a
+   running instance of an MQTT broker and publish commands to
+   a microcontroller.
+
+   Two buttons are displayed. One to turn a light on and the
+   other to turn a light off.
+
+   The broker is started first with:
+   mosquitto -c /usr/local/etc/mosquitto/mosquitto.conf -v
+
+-->
+
+<html>
+<head>
+
+  <!-- Include MQTT. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+
+  <!-- Begin Javascript. -->
+  <script type="text/javascript">
+
+      // The MQTT related code runs when the page loads.
+      // For a remote broker, we might use
+      // var loc = {'hostname' : 'iot.eclipse.org', 'port' : '80' };
+      // var loc = {'hostname' : 'localhost', 'port' : '9002' };
+      var loc = {'hostname' : '192.168.86.29','port':'9002'};
+      // Create a broker instance with a unique ID.
+      // We use the "new Date" to make sure we provide a new, unique, ID.
+
+      broker = new Paho.MQTT.Client(loc.hostname, Number(loc.port), 'CommandPublisher'+new Date());
+
+      // Set two callback handlers.
+      // One if the connection is lost.
+      broker.onConnectionLost = onConnectionLost;
+      // Another when a message arrives.
+      broker.onMessageArrived = onMessageArrived;
+
+      // Connect the broker and after successful, call the onConnect function.
+      // This function will only be called if the connection has been established.
+      // The call to connect is asynchronous and will return right away. So, we provide
+      // a callback to perform the subscribe.
+
+      broker.connect({onSuccess:onConnect});
+
+      // called afer the the broker sucessfuly connects to the broker
+
+      function onConnect() {
+        alert("MQTT Connection established")
+      }
+
+      // Called if the broker loses its connection.
+      function onConnectionLost(responseObject) {
+        alert("Lost the connection to the broker");
+      }
+
+      // This function is called each time a message arrives from the broker.
+      function onMessageArrived(message) {
+        alert("We do not expect messages from the broker");
+      }
+
+      function sendCommand(command) {
+        commandObject = new Object();
+        commandObject.light = command;
+        commandJSON = JSON.stringify(commandObject);
+        message = new Paho.MQTT.Message(commandJSON);
+        message.destinationName = "microcontrollerCommand"
+        broker.send(message);
+      }
+
+</script>
+
+<!-- This HTML is where the chart and messages are displayed. -->
+<title>Controlling Lights Remotely</title>
+</head>
+<body>
+
+Remote control
+<!-- container for the messages -->
+ <button onclick="sendCommand('on')">Turn on light</button>
+ <button onclick="sendCommand('off')">Turn off light</button>
+</body>
+</html>

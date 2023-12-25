@@ -1,0 +1,113 @@
+/* Style rules for index and menu pages */
+
+/* Importing Google Font 'Josefin Sans' for headers and other important text */
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;700&display=swap');
+
+/* General */
+
+* {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.button {
+    padding: 10px;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    background-color: rgb(138, 109, 90);
+    border-radius: 10px;
+    opacity: 0.9;
+}
+
+.button:hover {
+    background-color: rgb(146, 115, 94);
+}
+
+h1, h2, h3, h4, h5, h6, label, .button {
+    font-family: 'Josefin Sans', sans-serif;
+}
+
+/* Header */
+
+header {
+    text-align: center;
+    margin: -22px -2% 0;
+    padding-bottom: 30px;
+    padding-top: 20px;
+    border-bottom: 5px solid rgb(138, 109, 90);
+    background-color: rgb(206, 162, 133);
+    font-family: 'Josefin Sans';
+}
+
+/* Main content */
+
+.item {
+    border: 1px solid lightgray;
+    padding: 0 10px;
+    margin: 0px 0;
+}
+
+.item h4 {
+    margin: 15px 0 5px;
+}
+
+.item p {
+    margin: 0 0 15px;
+}
+
+li {
+    padding: 2px;
+}
+
+main {
+    display: block;
+    width: 80%;
+    margin: 30px auto;
+}
+
+section {
+    display: block;
+    margin: 30px 0;
+}
+
+ul {
+    margin-left: -20px;
+}
+
+/* Footer */
+
+footer {
+    border-top: 1px solid lightgray;
+    padding: 0 2%;
+}
+
+/* Form elements */
+
+/* Apply to all input elements that don't have an ID of 'submit' */
+input:not(#submit), select, textarea {
+    display: inline-block;
+    padding: 5px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    width: 33%;
+}
+
+#submit {
+    border: 0;
+    padding: 10px;
+    font-size: 1.1em;
+    cursor: pointer;
+}
+
+/* Responsive styles */
+
+/* Apply the following rules on devices with screen widths of 600px or less */
+@media screen and (max-width: 600px) {
+    input:not(#submit), select, textarea {
+        width: 90%;
+    }
+
+    main {
+        width: 90%; /* Make main container wider on the screen */
+    }
+}

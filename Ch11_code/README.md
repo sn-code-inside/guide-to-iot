@@ -1,0 +1,377 @@
+# Ch11_code
+
+## To use node-red-contrib-machine-learning 1.0.8
+
+1. Install Python3
+2. Install numpy
+   pip3 install numpy
+3. Install Anaconda3
+4. Install pandas
+5. Install scikit-learn
+   pip install -U scikit-learn
+6. Check on scikit-learn with
+   python3 -m pip show scikit-learn
+7. Install the node-red node in ~/.node-red with
+ npm i node-red-contrib-machine-learning
+ npm install node-red-contrib-machine-learning-v2
+8. cd into the directory
+   ~/.node-red/node_modules/node-red-contrib-machine-learning
+9. run node-red with
+   node-red
+10. You will see a list of available node on the pallette
+11. On the hamburger icon choose import and paste in the following flow as a new flow:
+[
+    {
+        "id": "da8ca300.2dfe6",
+        "type": "create dataset",
+        "z": "21ce826.2ff977e",
+        "name": "",
+        "path": "test/iris.data",
+        "saveFolder": "test/datasets",
+        "saveName": "iris",
+        "input": "0,1,2,3",
+        "output": "4",
+        "trainingPartition": "",
+        "shuffle": true,
+        "seed": "",
+        "x": 340,
+        "y": 80,
+        "wires": [
+            [
+                "4fb0a8dc.f6baf8"
+            ]
+        ]
+    },
+    {
+        "id": "44b6f4b0.34d7dc",
+        "type": "load dataset",
+        "z": "21ce826.2ff977e",
+        "name": "",
+        "datasetFolder": "test/datasets",
+        "datasetName": "iris",
+        "partition": "train.csv",
+        "input": true,
+        "output": true,
+        "x": 290,
+        "y": 200,
+        "wires": [
+            [
+                "26110acb.cbf526"
+            ],
+            [
+                "86385870.9f6b88"
+            ]
+        ]
+    },
+    {
+        "id": "4f7cc53d.87a22c",
+        "type": "inject",
+        "z": "21ce826.2ff977e",
+        "name": "start",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 110,
+        "y": 80,
+        "wires": [
+            [
+                "da8ca300.2dfe6"
+            ]
+        ]
+    },
+    {
+        "id": "d3e9e7ab.a06d68",
+        "type": "inject",
+        "z": "21ce826.2ff977e",
+        "name": "start",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 110,
+        "y": 200,
+        "wires": [
+            [
+                "44b6f4b0.34d7dc"
+            ]
+        ]
+    },
+    {
+        "id": "b21982e2.99cf1",
+        "type": "inject",
+        "z": "21ce826.2ff977e",
+        "name": "start",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 110,
+        "y": 440,
+        "wires": [
+            [
+                "f1b47338.aab82",
+                "1ea9f445.89d0bc"
+            ]
+        ]
+    },
+    {
+        "id": "4fb0a8dc.f6baf8",
+        "type": "debug",
+        "z": "21ce826.2ff977e",
+        "name": "print",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 570,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "86385870.9f6b88",
+        "type": "debug",
+        "z": "21ce826.2ff977e",
+        "name": "error",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 770,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "2270c854.c34e08",
+        "type": "debug",
+        "z": "21ce826.2ff977e",
+        "name": "print",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 750,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "e69a3271.c7cab",
+        "type": "predictor",
+        "z": "21ce826.2ff977e",
+        "name": "decision tree classifier predictor",
+        "modelPath": "test/models",
+        "modelName": "dtc.b",
+        "x": 550,
+        "y": 420,
+        "wires": [
+            [
+                "b8f2ab19.e693a8"
+            ],
+            [
+                "f7c59de2.be773"
+            ]
+        ]
+    },
+    {
+        "id": "26110acb.cbf526",
+        "type": "decision tree classifier",
+        "z": "21ce826.2ff977e",
+        "name": "decision tree classifier trainer",
+        "savePath": "test/models",
+        "saveName": "dtc.b",
+        "maxDepth": "",
+        "criterion": "gini",
+        "splitter": "best",
+        "x": 540,
+        "y": 200,
+        "wires": [
+            [
+                "2270c854.c34e08"
+            ],
+            [
+                "86385870.9f6b88"
+            ]
+        ]
+    },
+    {
+        "id": "b8f2ab19.e693a8",
+        "type": "assessment",
+        "z": "21ce826.2ff977e",
+        "name": "",
+        "score": "accuracy_score",
+        "x": 590,
+        "y": 360,
+        "wires": [
+            [
+                "808a0c93.8ee38"
+            ],
+            [
+                "f7c59de2.be773"
+            ]
+        ]
+    },
+    {
+        "id": "f1b47338.aab82",
+        "type": "load dataset",
+        "z": "21ce826.2ff977e",
+        "name": "",
+        "datasetFolder": "test/datasets",
+        "datasetName": "iris",
+        "partition": "test.csv",
+        "input": false,
+        "output": true,
+        "x": 290,
+        "y": 360,
+        "wires": [
+            [
+                "b8f2ab19.e693a8"
+            ],
+            [
+                "f7c59de2.be773"
+            ]
+        ]
+    },
+    {
+        "id": "1ea9f445.89d0bc",
+        "type": "load dataset",
+        "z": "21ce826.2ff977e",
+        "name": "",
+        "datasetFolder": "test/datasets",
+        "datasetName": "iris",
+        "partition": "test.csv",
+        "input": true,
+        "output": false,
+        "x": 290,
+        "y": 480,
+        "wires": [
+            [
+                "e69a3271.c7cab"
+            ],
+            [
+                "f7c59de2.be773"
+            ]
+        ]
+    },
+    {
+        "id": "f7c59de2.be773",
+        "type": "debug",
+        "z": "21ce826.2ff977e",
+        "name": "error",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 790,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "808a0c93.8ee38",
+        "type": "debug",
+        "z": "21ce826.2ff977e",
+        "name": "print",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 790,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "8a4ea95c.f860b8",
+        "type": "predictor",
+        "z": "21ce826.2ff977e",
+        "name": "decision tree classifier predictor",
+        "modelPath": "test/models",
+        "modelName": "dtc.b",
+        "x": 450,
+        "y": 580,
+        "wires": [
+            [
+                "e967043f.480868"
+            ],
+            [
+                "e66df10b.40ba8"
+            ]
+        ]
+    },
+    {
+        "id": "e967043f.480868",
+        "type": "mqtt out",
+        "z": "21ce826.2ff977e",
+        "name": "",
+        "topic": "predictions",
+        "qos": "",
+        "retain": "",
+        "broker": "cb216faf.d9136",
+        "x": 730,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "e66df10b.40ba8",
+        "type": "debug",
+        "z": "21ce826.2ff977e",
+        "name": "error",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 710,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "3cd1a442.2bc73c",
+        "type": "mqtt in",
+        "z": "21ce826.2ff977e",
+        "name": "",
+        "topic": "classification",
+        "qos": "2",
+        "broker": "cb216faf.d9136",
+        "x": 140,
+        "y": 580,
+        "wires": [
+            [
+                "8a4ea95c.f860b8"
+            ]
+        ]
+    },
+    {
+        "id": "cb216faf.d9136",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "",
+        "broker": "iot.eclipse.org",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": ""
+    }
+]
+
+12. A flow is saved after a deployment of the flow.

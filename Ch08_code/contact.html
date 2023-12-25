@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <title>Mike's Cafe - Contact</title>
+        <!-- Meta tags tell give important information about our webpage -->
+        <!-- The viewport meta tag is needed for responsive layouts -->
+        <meta charset="utf-8"/>
+        <meta name="description" content="The menu for Mike's Cafe" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- Including CSS rules from styles.css in our page -->
+        <link rel="stylesheet" type="text/css" href="styles.css"/>
+    </head>
+    <body>
+        <!-- Throughout the body, we are using semantic HTML tags to
+            give better insight into the content on the page. This
+            is thought to be better than simply using <div> everywhere -->
+        <header>
+            <h1>Mike's <br/> Cafe + Restaurant</h1>
+            <!-- Below is the main navigation menu. Since only the menu
+                page is built, the others have placeholder links -->
+            <nav>
+                <a class="button" href="index.html">Home</a>
+                <a class="button" href="menu.html">Menu</a>
+                <a class="button" href="contact.html">Contact</a>
+            </nav>
+        </header>
+        <main>
+            <!-- Different parts of the content are contained in <section>
+                tags to make each part smaller and more manageable -->
+            <section>
+                <h2>Contact Us</h2>
+                <p>Do you have a question that you'd like answered or a thought you'd like to share?
+                    Let us know with the form below. We'll get back to you as soon as we can.
+                </p>
+            </section>
+            <section>
+                <h3>Contact Form</h3>
+                <form>
+                    <!-- All form fields have labels and all are required.
+                        This makes it easier to complete the form correctly -->
+                    <label for="name">Name (required)</label><br/>
+                    <input id="name" type="text" required/>
+                    <br/><br/>
+                    <label for="email">Email Address (required)</label><br/>
+                    <input id="email" type="email" required/>
+                    <br/><br/>
+                    <label for="type">Message Type (required)</label><br/>
+                    <select id="type" required>
+                        <option value="feedback">Feedback</option>
+                        <option value="question">Question</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <br/><br/>
+                    <label for="msg">Your Message (required)</label><br/>
+                    <textarea id="msg" rows="10" required></textarea>
+                    <br/><br/>
+                    <input id="submit" class="button" type="submit"/>
+                </form>
+            </section>
+        </main>
+        <footer>
+            <!-- &copy; is used to generate the copyright symbol on the page -->
+            <p>&copy; 2021 Mike's Cafe.</p>
+        </footer>
+    </body>
+</html>

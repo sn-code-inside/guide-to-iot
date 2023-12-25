@@ -1,0 +1,115 @@
+<!--
+   Guide to Internet of Things
+
+   Chapter 9 index.html
+
+   This web application will cause the browser to connect to a
+   running instance of an MQTT broker and subscribe to messages
+   published to the patient/temperatureReport topic.
+
+   The broker was started with:
+   mosquitto -c /usr/local/etc/mosquitto/mosquitto.conf -v
+
+   A Google Chart gauge is used to display the temperatures.
+-->
+
+<html>
+  <head>
+
+    <!-- Using a simple inline css style -->
+    <style type="text/css">
+         <!--
+           .tab { margin-left: 40px; }
+         -->
+   </style>
+
+   <!-- Get Google charts -->
+   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+   <!-- Get the MQTT library -->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
+
+   <!-- Load the gauge -->
+   <script type="text/javascript">
+      google.charts.load('current', {'packages':['gauge']});
+      google.charts.setOnLoadCallback(drawGauge);
+
+      var data = null;
+      var chart = null;
+      var options = null;
+
+      <!-- Setup the parameters for the gauge and call changeGauge. -->
+      function drawGauge() {
+
+        data = google.visualization.arrayToDataTable([
+          ['Label', 'Value'],
+          ['Celsius', 0]
+        ]);
+
+        options = {
+          width: 400, height: 120,
+          yellowFrom:19.0, yellowTo:36.0,
+          greenFrom:36.0, greenTo:37.8,
+          redFrom: 37.8, redTo: 40.0,
+          minorTicks: 0.1, min:19.0,max:40.0
+        };
+
+        chart = new google.visualization.Gauge(document.getElementById('chart_div'));
+        // The initial gauge value is 34.0 degrees Celsius.
+        changeGauge(34.0);
+      }
+      <!-- Update the gauge -->
+      function changeGauge(tempValue) {
+        data.setValue(0, 1, tempValue);
+        chart.draw(data, options);
+      };
+    </script>
+
+    <!-- MQTT connection logic -->
+    <script>
+        // Create a client instance
+        client = new Paho.MQTT.Client('localhost', Number(9002), 'doctorID'+Math.floor(Math.random() * 100));
+
+        // set callback handlers
+        client.onConnectionLost = onConnectionLost;
+        client.onMessageArrived = onMessageArrived;
+
+        // connect the client
+        client.connect({onSuccess:onConnect});
+
+        // called when the client connects
+        function onConnect() {
+            // after connetion, subscribe to the topic
+            client.subscribe("patient/temperatureReport");
+
+        }
+
+        // called when the client loses its connection
+        function onConnectionLost(responseObject) {
+            alert('onConnectionLost error' + responseObject);
+            if (responseObject.errorCode !== 0) {
+                console.log("onConnectionLost:"+responseObject.errorMessage);
+            }
+        }
+
+        // This function is called when a message arrives from MQTT.
+        function onMessageArrived(message) {
+            // Place the contents in the document.
+            var payloadObj = JSON.parse(message.payloadString);
+            document.getElementById("json_arrival").innerHTML =message.payloadString;
+            document.getElementById("body_location").innerHTML =payloadObj.temperatureLocation;
+            // Update the gauge with this new data.
+            changeGauge(parseFloat(payloadObj.temperatureValue));
+        }
+    </script>
+    <!-- HTML document -->
+    <body>
+    <h1>Guide to Internet of Things Chapter 9 </h1>
+    <h1>Bluetooth Low Energy (BLE) to Node-RED to MQTT</h1>
+    <h2>This browser subcribes to an MQTT topic "patient/temperatureReport" over WebSockets.</h2>
+    <h2>The Temperature Gauge is a Google Chart.</h2>
+    <div id="chart_div" style="width: 400px; height: 120px;"></div>
+    <b><div class="tab" id="body_location"></div></b>
+    <h2>This is the JSON string arriving in real time from MQTT.</h2>
+    <p id="json_arrival"></p>
+    </body>
+</html>
