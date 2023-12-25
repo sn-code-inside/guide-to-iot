@@ -1,5 +1,6 @@
 
-// Guide to Internet of Things Chapter 9
+// Guide to Internet of Things
+// Chapter 9
 
 // This is Javascript logic that is placed inside
 // a Node-RED function node.

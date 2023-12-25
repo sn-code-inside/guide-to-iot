@@ -1,4 +1,6 @@
-// Guide to Internet of Things Chapter 9 Constrained Networking
+// Guide to Internet of Things
+// Chapter 9
+// Constrained Networking
 // This firmware was adapted from the BLE tutorial
 // found here: https://docs.particle.io/tutorials/device-os/bluetooth-le/
 

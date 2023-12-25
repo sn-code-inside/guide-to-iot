@@ -1,6 +1,5 @@
-# Ch08_code
-
-## Files
+## Guide To Internet of Things
+## Ch08_code
 
 Four files are needed for Chapter 8.
 
