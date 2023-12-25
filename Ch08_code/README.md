@@ -1,15 +1,11 @@
 ## Guide To Internet of Things
 ## Ch08_code
 
-Four files are needed for Chapter 8.
++ [index.html](./index.html)
++ [menu.html](./menu.html)
++ [contact.html](./contact.html)
++ [styles.css](./styles.css)
 
-The three HTML files (index.html, menu.html, and contact.html) contain the HTML code for each page.
-
-[index.html](./index.html), [menu.html](./menu.html), [contact.html](./contact.html)
-
-styles.css holds all of the CSS style rules for the website's layout and design.
-
-[styles.css](./styles.css)
 
 ## How to run
 
