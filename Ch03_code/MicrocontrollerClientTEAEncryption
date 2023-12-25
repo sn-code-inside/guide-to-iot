@@ -1,0 +1,296 @@
+// Guide to Internet of Things Chapter 3
+// MicrocontrollerClientTEAEncryption
+// This Microcontroller firmware demonstrates TEA encryption.
+
+// This code is for instructional and demonstration use only. In general, it is a
+// bad idea to write your own cryptography. Use open source standard libraries.
+// This code is provided for instructional purposes only and should
+// not be used in a real system.
+
+// The code for the TEA algorithm is taken from the
+// textbook: Distributed Systems: Concepts and Design 3rd edition
+// by  George Coulouris, Jean Dollimore, Tim Kindberg, and Gordon Blair.
+
+// TEA was released into the public domain by David Wheeler and Roger Needham.
+// See https://en.wikipedia.org/wiki/Tiny_Encryption_Algorithm
+
+// Include library for Base 64
+#include <Base64RK.h>
+
+// Include libray for HTTP requests
+#include <HttpClient.h>
+
+// http is a variable of the class HttpClient
+ HttpClient http;
+
+// Define a headers array holding two http_header_t objects.
+// Our request will include a JSON string. We inform the receiver
+// that it should expect to see JSON.
+ http_header_t headers[] = {
+    { "Content-Type", "application/json" },
+    { NULL, NULL }
+ };
+
+// Define an HTTP request object and an HTTP response object.
+// These objects hold the HTTP request and response.
+ http_request_t request;
+ http_response_t response;
+
+// Set the photResistor to A0
+int photoResistor = A0;
+
+// The analog value begins at 0.
+int analogValue = 0;
+
+// Use this char array to hold the device ID
+char deviceID[60];
+
+// Establish a loop timer to hold a value in milliseconds.
+unsigned long loop_timer;
+
+// Setup is performed once on start up.
+void setup() {
+
+   // We will communicate over the serial port.
+   Serial.begin(9600);
+
+   // In the request object, set the IP address and port of the server that
+   // we will visit.
+   request.ip = IPAddress(192,168,86,216);
+   request.port = 3000;
+
+   // The deviceID is found by calling System.deviceID().c_str();
+   // Here, we copy the device ID into the character array named deviceID.
+   strcpy(deviceID,System.deviceID().c_str());
+   // For debugging, display the device ID on the console.
+   Serial.printlnf("This device has the id of %s", deviceID);
+
+   // Set the time to the current time
+   loop_timer = millis();
+
+ }
+
+ // Provided with a response, display it to the command line console..
+ // &response is a reference to the HTTP response.
+ void printResponse(http_response_t &response) {
+   Serial.println("HTTP Response: ");
+   Serial.println(response.status);
+   Serial.println(response.body);
+ }
+
+ // Perform an HTTP post request.
+ // The data provided, within the JSON message, is in Base 64 notation.
+ void doPostRequest(char encryptedByteArrayBase64[]) {
+
+   // Provide the path to the service
+   request.path = "/microcontrollerEvent";
+
+   // Build the JSON request
+   char json[1000] = "{\"encryptedData\":\"";
+   // Add the encrypted data
+   strcat(json,encryptedByteArrayBase64);
+   // add the JSON ending
+   strcat(json,"\"}");
+   // assign the JSON string to the HTTP request body
+   request.body = json;
+   // post the request and block and wait for a response.
+   http.post(request, response, headers);
+   // show response once it arrives
+   printResponse(response);
+ }
+ // loop() is called repeatedly by the operating system
+ void loop() {
+
+    // every 5 seconds do a post to the server
+  if(millis() - loop_timer >= 10000UL) {
+
+    // read the analog value from the photodiode
+    analogValue = analogRead(photoResistor);
+    Serial.printlnf("AnalogValue == %u", analogValue);
+
+    // This clear text message will be held local to the device.
+    char clearText[80];
+    // Use sprintf to copy a formatted string into the clearText array.
+    // The clearText is the text we want to encrypt.
+    sprintf(clearText, "Microcontroller ID = %s  Light sensor = %d", deviceID, analogValue);
+
+    Serial.printlnf("Clear text: %s",clearText);
+
+     // determine the length of the string holding the clear text
+    int lengthOfClearText = strlen(clearText);
+
+    // Set a byte pointer to the clearText.
+    byte *clearTextBytes = (byte *) clearText;
+
+    // TEA needs four 32 bit ints as key. The key should be 128 bits of random data.
+    // Here, we just use four integers as our key. This approach is not secure.
+    // TEA is a symmetric cipher and so we will use the same key for encryption
+    // and decryption.
+    unsigned long key[] = {12,34,56,91};
+
+    // Do the encryption and point to the encrypted data.
+    // clearTextBytes points to the data we intend to encrypt.
+    // The length of this text and the encryption key is also provided.
+    // The length of the padded and encrypted data is placed in encryptedSize.
+    int encryptedSize = 0;
+    byte* TEACipherBytes = padAndEncryptWithTEA(clearTextBytes, lengthOfClearText, &encryptedSize, key) ;
+
+    // Here, we call on decryptAndUnpad to decrypt the encrypted data and removing the padding.
+    // We do this to test that encryption is working properly.
+
+    byte *decryptedClearTextBytes =  decryptAndUnpad(TEACipherBytes, encryptedSize, key);
+
+    // Compare the decrypted data with the original.
+    char *decryptedString = (char *) decryptedClearTextBytes;
+
+    Serial.printlnf("Clear text after decryption : %s",decryptedString );
+
+    if(strcmp(decryptedString,clearText) == 0) {
+      // The decrypted data matched the original clear text.
+      Serial.println("Strings matched");
+    }
+    else {
+      // The strings did not match and so there is a problem with
+      // the encryption or decryption.
+      Serial.println("Error: Strings not matched");
+    }
+
+   // Encode the encrypted byte array in Base64
+
+   // First, find the size of the base 64 data.
+   size_t sizeOfBase64 = Base64::getEncodedSize(encryptedSize, true);
+   // Second, allocate room for the base 64 data.
+   char * encryptedByteArrayBase64 = (char *)calloc(sizeOfBase64, sizeof(char));
+
+   // Use a library to do the encoding from binary to base 64.
+   Base64::encode(TEACipherBytes, encryptedSize, encryptedByteArrayBase64, sizeOfBase64, true );
+
+   // Display the encrypted data in base 64 on the console.
+   Serial.printlnf("Encrypted data in Base 64 %s",encryptedByteArrayBase64);
+
+   // Post the encrypted data in base 64 to the web server
+   doPostRequest(encryptedByteArrayBase64);
+
+   // Free up the memory that was allocated for the arrays.
+
+    free(TEACipherBytes);
+    free(decryptedClearTextBytes);
+    free(encryptedByteArrayBase64);
+
+    // reset loop_timer
+   loop_timer = millis();
+   }
+ }
+
+// This routine adds padding to the data to be encrypted and calls TEA
+// to perform the encryption.
+byte* padAndEncryptWithTEA(byte clearTextBytes[], int lengthOfClearText, int *encryptedSize, unsigned long k[]) {
+
+    // Set n to the number of bytes in clearTextBytes (include the null byte).
+    int n = lengthOfClearText + 1;
+
+    // Create an array to hold the padded data
+    // The array is of size (n / 8 + 1) * 8
+    // The *encryptedSize is evenly divisible by 8
+    *encryptedSize = (n / 8 + 1) * 8;
+    byte *pa = (byte *)calloc(*encryptedSize, sizeof(byte));
+
+    // Copy bytes to the new, padded array.
+    for(int i = 0; i < n; i++) pa[i] = clearTextBytes[i];
+    // Set any extra bytes to 0
+    for(int i = n; i < *encryptedSize; i++) pa[i] = 0;
+    // Set the rightmost byte to to the number of padding bytes
+    pa[*encryptedSize - 1 ] = *encryptedSize - n;
+
+    // set an unsigned long pointer to the padded data
+    unsigned long *paddedArrayPointer = (unsigned long *)pa;
+
+    // Call TEA for each pair of unsigned longs in the padded array.
+    int numCalls = *encryptedSize / 8;
+    for (int i = 0; i < numCalls; i++) {
+         encryptTEA(k,paddedArrayPointer);
+         // Bump the pointer by two unsigned longs
+         paddedArrayPointer = paddedArrayPointer + 2;
+
+    }
+    return pa;
+}
+
+// Decrypt the TEACipherBytes using the key provided.
+// Remove the padding and return a newly allocated array of clear text bytes.
+
+byte * decryptAndUnpad(byte * TEACipherBytes, int encryptedSize, unsigned long key[]) {
+
+   // First, decrypt the TEACipherBytes
+   // Call TEA for each pair of unsigned longs in the padded array.
+
+   // set an unsigned long pointer to the padded data
+   unsigned long *paddedArrayPointer = (unsigned long *)TEACipherBytes;
+
+   // *encryptedSize is divisible by 8
+   // call decrypt and each call handles 8 bytes
+   int numCalls = encryptedSize / 8;
+   for (int i = 0; i < numCalls; i++) {
+        decryptTEA(key,paddedArrayPointer);
+        // Bump the pointer by two unsigned longs
+        paddedArrayPointer = paddedArrayPointer + 2;
+
+   }
+   // The data in TEACipherBytes is decrypted
+   // The last byte has the number of padding bytes to remove
+   int padToRemove = TEACipherBytes[encryptedSize-1];
+
+   // Compute the number of bytes we are interested in
+   int n = encryptedSize - padToRemove;
+
+   // allocate room for n bytes
+   byte *clearTextByteArray = (byte *)calloc(n, sizeof(byte));
+
+   // Copy the bytes we are interested in into the clearTextByteArray
+   for(int i = 0; i < n; i++) clearTextByteArray[i] = TEACipherBytes[i];
+
+   // Return the clear text bytes
+   return clearTextByteArray;
+
+}
+
+// TEA code from Distributed Systems: Concepts and Design 3rd edition
+
+// TEA operates on two 32-bit message blocks with a 128-bit key.
+// We make use of k[0], k[1], k[2], and k[3] for the key.
+// We encrypt two unsigned longs: text[0] and text[1].
+// An unsigned long is 4 bytes.
+// So, we are encrypting 8 bytes.
+void encryptTEA(unsigned long k[], unsigned long text[]) {
+
+    unsigned long y = text[0], z = text[1];
+    unsigned long delta = 0x9e3779b9, sum = 0;
+    int n;
+    for(n = 0; n < 32; n++){
+        sum += delta;
+        y += ((z<<4)+k[0])^(z+sum)^((z>>5)+k[1]);
+        z += ((y<<4)+k[2])^(y+sum)^((y>>5) + k[3]);
+    }
+    text[0] = y;
+    text[1] = z;
+}
+// TEA code from Distributed Systems: Concepts and Design 3rd edition
+
+// TEA operates on two 32-bit message blocks with a 128-bit key.
+// We make use of k[0], k[1], k[2], and k[3] for the key.
+// We decrypt two unsigned longs: text[0] and text[1].
+// An unsigned long is 4 bytes.
+// So, we are decrypting 8 bytes.
+void decryptTEA(unsigned long k[], unsigned long text[]) {
+
+     unsigned long y = text[0], z = text[1];
+     unsigned long delta = 0x9e3779b9, sum = delta << 5;
+     int n;
+     for(n = 0; n < 32; n++){
+          z -= ((y << 4) + k[2]) ^ (y + sum) ^ ((y >> 5) + k[3]);
+          y -= ((z << 4) + k[0]) ^ (z + sum) ^ ((z >> 5) + k[1]);
+          sum -= delta;
+     }
+     text[0] = y;
+     text[1] = z;
+}

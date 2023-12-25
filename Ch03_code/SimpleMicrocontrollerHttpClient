@@ -1,0 +1,112 @@
+// Guide to Internet of Things Chapter 3
+// File name: SimpleMicrocontrollerHttpClient
+
+// This is a simple HTTP client that makes periodic visits on an HTTP
+// server. It sends a message in JSON format using an HTTP POST request.
+
+// After flashing, to view the serial monitor messages enter
+// particle serial monitor
+
+// in a terminal command line interface.
+
+// To compile this code, you must first choose Libraries
+// and search for the HttpClient library in the Particle IDE.
+// The library must be added to this project before flashing
+// the code to the device.
+
+// This #include statement was automatically added by the Particle IDE when
+// the HttpClient library was included in this project.
+#include <HttpClient.h>
+
+// This program assumes a server is available and can receive
+// HTTP Post messages such as:
+
+// http://localhost:3000/microcontrollerEvent
+
+// The Http headers are followed by a blank line.
+// The next line (after the blank line) will contain
+// a JSON string such as:
+
+// {"encryptedData":"abcdefghijk"}
+
+
+ // Define the http variable to be of type HttpClient.
+ HttpClient http;
+
+ // We always pass Http headers on each request to the Http server
+ // Here, we only define a single header. The NULL, NULL pair is used
+ // to terminate the list of headers.
+
+ // The Content-Type header is used to inform the server
+ // of the type of message that it will be receiving. Here,
+ // we tell the server to expect to receive data marked up in
+ // JSON.
+
+ http_header_t headers[] = {
+    { "Content-Type", "application/json" },
+    { NULL, NULL }
+ };
+
+// Here we define structures to hold the request and the response data.
+// These are declared with types defined in the header file included above.
+
+ http_request_t request;
+ http_response_t response;
+
+ //A variable to hold the device unique ID
+ String deviceID = "";
+
+ // So we can avoid using sleep()
+ unsigned long loop_timer;
+
+ void setup() {
+
+   // Specify the speed with which we will talk to the serial interface.
+   // The serial interface is associated with our shell or command line
+   // interface.
+
+   Serial.begin(9600);
+
+   // The IP address of the server running on our machine.
+   // Do not use localhost. The microcontroller would attempt
+   // to visit itself with localhost.
+   request.ip = IPAddress(192,168,86,164);
+
+   // Specify the port that our server is listening on.
+   request.port = 3000;
+
+   // get the unique id of this device as 24 hex characters
+   // this value is unused in this firmware.
+
+   deviceID = System.deviceID().c_str();
+
+   // display the id to the command line interface
+   Serial.println(deviceID);
+
+   // find the time
+   loop_timer = millis();
+ }
+
+ // Provided with a response, display it to the command line interface.
+ void printResponse(http_response_t &response) {
+   Serial.println("HTTP Response: ");
+   Serial.println(response.status);
+   Serial.println(response.body);
+ }
+
+ // Post a message to the server
+ void doPostRequest() {
+
+   request.path = "/microcontrollerEvent";
+   request.body = "{\"encryptedData\":\"Simple message\"}";
+
+   http.post(request, response, headers);
+   printResponse(response);
+ }
+ // Every 5 seconds, perform a POST request
+ void loop() {
+   if(millis() - loop_timer >= 5000UL) {
+       loop_timer = millis();
+       doPostRequest();
+   }
+ }

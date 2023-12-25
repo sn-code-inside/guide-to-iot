@@ -1,0 +1,24 @@
+// Guide to Internet of Things
+// Chapter 3 Part 1
+// File name: LightMonitor
+// View output from the command line with
+// particle serial monitor
+
+int photoResistor = A0;
+int analogValue;
+
+unsigned long loop_timer;
+
+void setup() {
+  Serial.println("Simple setup complete");
+  loop_timer = millis();
+}
+
+
+void loop() {
+    if(millis() - loop_timer >= 1000UL) {
+        loop_timer = millis();
+        analogValue = analogRead(photoResistor);
+        Serial.printlnf("AnalogValue == %u", analogValue);
+    }
+}
