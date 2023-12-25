@@ -1,4 +1,5 @@
-
+// Guide to Internet of Things
+// Chapter 7
 // Photon2-Command-From-MQTT
 // This firmware runs on a Photon 2 microcontroller.
 // It receives commands from MQTT.

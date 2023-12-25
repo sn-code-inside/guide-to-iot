@@ -1,4 +1,5 @@
-
+// Guide to Internet of Things
+// Chapter 6
 // Photon2-heartbeat-to-MQTT
 // Firmware to run on an Photon 2 microcontroller
 // This program runs on a microcontroller and

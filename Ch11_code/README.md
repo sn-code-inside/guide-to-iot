@@ -1,6 +1,9 @@
-# Ch11_code
+<!--
+Guide to Internet of Things
+Chapter 11
+-->
 
-## To use node-red-contrib-machine-learning 1.0.8
+## Instructions to use node-red-contrib-machine-learning 1.0.8
 
 1. Install Python3
 2. Install numpy
