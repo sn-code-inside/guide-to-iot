@@ -1,9 +1,8 @@
-<!--
-Guide to Internet of Things
-Chapter 11
--->
 
-## Instructions to use node-red-contrib-machine-learning 1.0.8
+## Guide To Internet of Things
+## Ch11_code Machine Learning and Facial Recognition
+
+## Instructions on using node-red-contrib-machine-learning 1.0.8
 
 1. Install Python3
 2. Install numpy
