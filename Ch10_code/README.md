@@ -1,7 +1,7 @@
 
-#Guide To Internet of Things
-#Ch10_code
-##Persistence and Visualization
+# Guide To Internet of Things
+# Ch10_code
+## Persistence and Visualization
 
 + [Part 1 WaterSensor.ino](./WaterSensor.ino)
 + [Part 2 WaterSensorWithHTTP.ino](./WaterSensorWithHTTP.ino)

@@ -1,6 +1,6 @@
-#Guide To Internet of Things
-#Ch06_code
-##Publish Subscribe Using MQTT
+# Guide To Internet of Things
+# Ch06_code
+## Publish Subscribe Using MQTT
 
 + [Photon2-heartbeat-to-MQTT.ino for the microcontroller](./Photon2-heartbeat-to-MQTT.ino)
 + [index.js is a server to be run in node.js](./Ch06_Photon2_publish-to-mqtt/Chapter6_Part3/index.js)

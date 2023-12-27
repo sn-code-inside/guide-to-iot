@@ -1,7 +1,7 @@
 
-#Guide To Internet of Things
-#Ch11_code
-##Machine Learning and Facial Recognition
+# Guide To Internet of Things
+# Ch11_code
+## Machine Learning and Facial Recognition
 
 ## Instructions on using node-red-contrib-machine-learning 1.0.8
 
