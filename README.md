@@ -3,7 +3,7 @@
 ## Code repository
 
 + [Chapter 01 Introduction](./Ch01_code)
-+ [Chapter 02 Setting up your systems](./Ch02_code)
++ [Chapter 02 Setting up your system](./Ch02_code)
 + [Chapter 03 Securing IoT Data](./Ch03_code)
 + [Chapter 04 Web APIs](./Ch04_code)
 + [Chapter 05 Building a Smart, Connected Product](./Ch05_code)
