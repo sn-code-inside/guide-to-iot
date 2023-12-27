@@ -23,6 +23,7 @@
    node-red
 10. You will see a list of available node on the pallette
 11. On the hamburger icon choose import and paste in the following flow as a new flow:
+```
 [
     {
         "id": "da8ca300.2dfe6",
@@ -376,5 +377,5 @@
         "birthPayload": ""
     }
 ]
-
+```
 12. A flow is saved after a deployment of the flow.
