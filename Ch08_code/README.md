@@ -2,12 +2,7 @@
 # Ch08_code
 ## Identification Technologies
 
-+ [index.html](./index.html)
-+ [menu.html](./menu.html)
-+ [contact.html](./contact.html)
-+ [styles.css](./styles.css)
-
-
-## How to run
-
-To view the website, simply download the files to your computer and click on any of the HTML in your file explorer. This will open up the site in your computer's default browser. To make modifications, open up the necessary file(s) in a code editor.
++ [Part 1 index.html](./index.html)
++ [Part 1 menu.html](./menu.html)
++ [Part 1 contact.html](./contact.html)
++ [Part 1 styles.css](./styles.css)
