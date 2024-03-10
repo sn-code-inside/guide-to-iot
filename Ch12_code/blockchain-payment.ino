@@ -6,18 +6,15 @@
 It periodically checks a web service to see if money has been paid to its Ethereum account.
 If the program detects an increase in its Ethereum balance, it turns on its D7 LED for a
 certain number of seconds. The number of seconds the LED is on corresponds to the amount
-of increase that was paid to its account.
+of increase that was paid to its account. For each ETH, we get 1 second of light.
 
 Before flashing the program to a Particle Photon 2 mocrocontroller, make two changes:
 
 (1) Change the IP address to the correct address of the machine where the web service is running.
-    Currently, it is set to char myHost[] = "192.168.86.216";
+    Currently, it is set with char myHost[] = "192.168.86.250";
 (2) Change the Ethereum account address to the address of the microcontroller's
-account. Currently, it is set to
-char pathWithEthereumAddress[] = "/getBalance/0x3a1926FB8Cbca045218C06bD2B19bD456f7E9Eb4";
-
-Note: Upon startup, the light will be blue for a certain number of seconds depending
-on how many Eth are in its account.
+Ethereum account. Currently, it is set with
+char pathWithEthereumAddress[] = "/getBalance/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
 
 */
 
@@ -51,7 +48,7 @@ http_request_t request;
 http_response_t response;
 
 // Service  IP location. This will normally need to change.
-char myHost[] = "192.168.86.216";
+char myHost[] = "192.168.86.250";
 // Service port
 int port = 3000;
 
@@ -59,19 +56,7 @@ int port = 3000;
 // Specify the microcontroller's Ethereum account address on the path.
 // This will normally need to change.
 
-char pathWithEthereumAddress[] = "/getBalance/0x3a1926FB8Cbca045218C06bD2B19bD456f7E9Eb4";
-
-// Do this on start up
-void setup() {
-
-    Serial.begin(9600);
-    request.hostname = myHost;
-    request.port = port;
-    request.path = pathWithEthereumAddress;
-    pinMode(MY_LED, OUTPUT);
-    // Turn light off
-    digitalWrite(MY_LED, LOW);
-}
+char pathWithEthereumAddress[] = "/getBalance/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
 
 // Handle time values.
 // oldCallTime is used for timing the calls to the servie.
@@ -84,6 +69,7 @@ unsigned int callInterval = 5000;
 // And check the light every one second
 unsigned int secondInterval = 1000;
 
+
 // Hold Ethereum balance
 int prevBalance = 0;
 // Add to secondsBucket if we see an increase in the controller's account.
@@ -94,12 +80,29 @@ int secondsBucket = 0;
 char addr[1000];
 char balance[1000];
 
+// Do this on start up.
+// Note that we make a call for the initial balance on startup.
+// The light will come on when there is an increase in the balance.
+void setup() {
+
+    Serial.begin(9600);
+    request.hostname = myHost;
+    request.port = port;
+    request.path = pathWithEthereumAddress;
+    pinMode(MY_LED, OUTPUT);
+    // Turn light off
+    digitalWrite(MY_LED, LOW);
+    // get initial balance fro the blockchain
+    prevBalance = callAndGetTruncatedEthBalance();
+}
+
+
 void loop() {
 
 
      // Every second take 1 away from the seconds bucket or set it to 0.
      // If there are seconds in the bucket, turn the light on.
-     // If there are no seconds left, turn the light off.
+     // If there are no seconds left in the bucket, turn the light off.
      if (millis() - oldSecondsTime >= secondInterval) {
 
         if (secondsBucket > 0) {
@@ -120,12 +123,13 @@ void loop() {
      if (millis() - oldCallTime >= callInterval) {
 
         int bal = callAndGetTruncatedEthBalance();
-
+        // If there is an increase, add seconds to the bucket.
         if(bal > prevBalance) {
             secondsBucket = secondsBucket + (bal - prevBalance);
-            prevBalance = bal;
         }
-
+        // The previous balance becomes the new balance.
+        prevBalance = bal;
+        // Update oldCallTime with new time
         oldCallTime = millis();
      } // end if
 
@@ -135,6 +139,7 @@ void loop() {
 
 int callAndGetTruncatedEthBalance() {
 
+        // result will hold the new balance
         int result = 0;
 
         // Make the HTTP Get request and include the Ethereum address.
@@ -143,16 +148,12 @@ int callAndGetTruncatedEthBalance() {
         // If all went well...
         if(response.status == 200) {
 
-             // Serial.println("Response.body");
-             // Serial.println(response.body);
-
-             Serial.println("response.status ==  200");
              JSONValue outerObj = JSONValue::parseCopy(response.body);
              JSONObjectIterator iter(outerObj);
 
-             // We know only one name-value pair is returned so use
-             // if rather than while.
-             if (iter.next())
+             // More than one name-value pair is returned so use
+             // while rather than if. 
+             while (iter.next())
              {
 
                 if(iter.name() == "Account")
@@ -162,11 +163,9 @@ int callAndGetTruncatedEthBalance() {
                 }
                 if (iter.name() == "balance") {
                    strcpy(balance,iter.value().toString().data());
-                   Serial.printf("Account balance: %s",balance);
                    result = balanceTruncatedToEth(balance);
-                   Serial.printf("Balance truncated to Eth %d", result );
+                   // Serial.printf("Balance truncated to Eth %d", result );
                 }
-                Serial.println();
              } // end while
         } // end if
         else {
